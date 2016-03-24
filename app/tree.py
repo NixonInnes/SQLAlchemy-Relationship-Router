@@ -1,4 +1,5 @@
 from sqlalchemy import inspect
+from collections import defaultdict
 from app.db import Base
 
 def get_sql_tables():
@@ -12,6 +13,38 @@ def get_sql_tables():
 # { tablename : table_object }
 # i.e. { 'pipes': <class '__main__.Pipe'> }
 sql_tables = get_sql_tables()
+
+class Graph(object):
+    def __init__(self):
+        self.nodes = set()
+        self.branches = defaultdict(set)
+        self.distances = {}
+
+    def add_node(self, node):
+        self.nodes.add(node)
+
+    def add_branch(self, from_node, to_node, dist=1):
+        self.branches[from_node].append(to_node)
+        self.branches[to_node].append(from_node)
+        self.distances[(from_node, to_node)] = dist
+
+    #lets get all dijkstra on this bizznatch
+    def dijk_map(self, start):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # { table_object : node_object }
 # i.e. { <class '__main__.User'> : <Node: <class '__main__.User'>> }
