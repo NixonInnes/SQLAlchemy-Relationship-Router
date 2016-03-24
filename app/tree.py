@@ -1,4 +1,5 @@
 from sqlalchemy import inspect
+from app.db import Base
 
 def get_sql_tables():
     classes = {}
