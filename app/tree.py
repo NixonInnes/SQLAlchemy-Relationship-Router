@@ -60,4 +60,7 @@ def walk(start, target):
                         queue.append(class_nodes[sql_tables[rel.table.name]])
 
 def test_walk():
-    print(walk('pipes', 'projects'))
+    print("TEST: walk('pipes', 'projects')")
+    return walk('pipes', 'projects')
+
+test_walk()
