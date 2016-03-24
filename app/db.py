@@ -60,4 +60,10 @@ class Pipe(Base):
     branch_id = Column(Integer, ForeignKey('branches.id'))
 
 
+class NaePals(Base):
+    __tablename__ = 'naepals'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+
 Base.metadata.create_all(engine)
