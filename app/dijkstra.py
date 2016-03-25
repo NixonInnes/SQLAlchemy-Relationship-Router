@@ -3,7 +3,7 @@ from collections import defaultdict
 from heapq import heappop, heappush
 from app.db import Base
 
-class Graph(object):
+class Router(object):
     def __init__(self, Base):
         self.tables = {}
         self.make_tables(Base)
