@@ -21,7 +21,7 @@ Import initialied Base class into dijkstra.py from your model definitions:
 Initialise a Graph:  
 `g = Graph(Base)`  
 
-All tables are stored in the graph: 
+All tables are stored in the graph:  
 `g.tables`  
 
 Get a route:  
