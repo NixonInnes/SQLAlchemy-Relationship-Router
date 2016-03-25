@@ -12,13 +12,27 @@ def get_sql_tables():
 
 
 # { tablename : table_object }
-# i.e. { 'pipes': <class '__main__.Pipe'> }
 sql_tables = get_sql_tables()
+
+class Q(object):
+    def __init__(self, dist, node, path):
+        self.dist = dist
+        self.node = node
+        if not isinstance(path, list):
+            self.path = [path]
+        else:
+            self.path = path
+
+    def __lt__(self, other):
+        return self.dist < other.dist
+        
+
 relationships = []
+
 for table in sql_tables:
     for rel in inspect(sql_tables[table]).relationships:
-        relationships.append( (sql_tables[table], sql_tables[rel.table.name], 1) ) #Change this 1 to give "weight"/"distance" to the nodes
-
+        relationships.append((sql_tables[table], sql_tables[rel.table.name], 1))
+        
 
 def walk(rels, start, target):
     graph = defaultdict(list)
@@ -26,18 +40,21 @@ def walk(rels, start, target):
     for frm, to, dist in rels:
         graph[frm].append( (dist, to) )
 
-    queue = [ (0, start, ()) ]
+    queue = [Q(0, start, [])]
     checked = set()
 
     while queue:
-        print(queue)
-        (dist, node, path) = heappop(queue)
-        if rel not in checked:
-            checked.add(rel)
-            path = (rel, path)
-            if node is target:
-                return dist, path
-            for dist_n, node_n in graph.get(node, ()):
+        #print(queue)
+        q = heappop(queue)
+        if q.node not in checked:
+            checked.add(q.node)
+            path = q.path + [q.node]
+            if q.node is target:
+                return q.dist, path
+            for dist_n, node_n in graph.get(q.node, ()):
                 if node_n not in checked:
-                    heappush(queue, (dist+dist_n, node_n, path))
+                    heappush(queue, Q(q.dist+dist_n, node_n, path))
     return float('inf')
+
+#print("TEST: walk(relationships, sql_tables['mid-mids'], sql_tables['top-rights'])")
+#print(walk(relationships, sql_tables['mid-mids'], sql_tables['top-rights']))
