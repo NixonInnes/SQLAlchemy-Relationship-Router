@@ -57,5 +57,5 @@ class Router(object):
     def table(self, tablename):
         return self.tables.get(tablename)
 
-#g = Graph(Base)
+#g = Router(Base)
 #g.get_route(g.tables['mid-mids'], g.tables['top-rights'])
