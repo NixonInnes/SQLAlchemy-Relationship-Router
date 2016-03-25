@@ -18,10 +18,10 @@ O - representing each Base object
 Import initialied Base class into dijkstra.py from your model definitions:  
 `from app.db import Base`  
 
-Initialise a Graph:  
-`g = Graph(Base)`  
+Initialise a Router:  
+`g = Router(Base)`  
 
-All tables are stored in the graph:  
+All tables are stored in the router:  
 `g.tables`  
 
 Get a route:  
