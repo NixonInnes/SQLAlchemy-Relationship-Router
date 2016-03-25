@@ -1,7 +1,7 @@
 from sqlalchemy import inspect
 from collections import defaultdict
 from heapq import heappop, heappush
-#from app.db import Base
+from app.db import Base
 
 class Graph(object):
     def __init__(self, Base):
