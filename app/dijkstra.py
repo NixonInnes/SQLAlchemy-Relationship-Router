@@ -3,58 +3,56 @@ from collections import defaultdict
 from heapq import heappop, heappush
 from app.db import Base
 
-def get_sql_tables():
-    classes = {}
-    for cls in Base._decl_class_registry.values():
-        if hasattr(cls, '__tablename__'):
-            classes[cls.__tablename__] = cls
-    return classes
-
-
-# { tablename : table_object }
-sql_tables = get_sql_tables()
-
-class Q(object):
-    def __init__(self, dist, node, path):
-        self.dist = dist
-        self.node = node
-        if not isinstance(path, list):
-            self.path = [path]
-        else:
-            self.path = path
-
-    def __lt__(self, other):
-        return self.dist < other.dist
+class Graph(object):
+    def __init__(self, Base):
+        self.tables = self.get_tables(Base)
+        self.relationships = []
+        self.get_relationships()
         
+    def get_tables(self, Base):
+        tables = {}
+        for cls in Base._decl_class_registry.values():
+            if hasattr(cls, '__tablename__'):
+                tables[cls.__tablename__] = cls
+        return tables
 
-relationships = []
+    def get_relationships(self):
+        for table in self.tables:
+            for rel in inspect(self.tables[table]).relationships:
+                self.relationships.append((self.tables[table], self.tables[rel.table.name], 1))
 
-for table in sql_tables:
-    for rel in inspect(sql_tables[table]).relationships:
-        relationships.append((sql_tables[table], sql_tables[rel.table.name], 1))
-        
+    class Q(object):
+        def __init__(self, dist, node, path):
+            self.dist = dist
+            self.node = node
+            if not isinstance(path, list):
+                self.path = [path]
+            else:
+                self.path = path
 
-def walk(rels, start, target):
-    graph = defaultdict(list)
+        def __lt__(self, other):
+            return self.dist < other.dist
 
-    for frm, to, dist in rels:
-        graph[frm].append( (dist, to) )
+    def walk(self, start, target):
+        graph = defaultdict(list)
 
-    queue = [Q(0, start, [])]
-    checked = set()
+        for frm, to, dist in self.relationships:
+            graph[frm].append( (dist, to) )
 
-    while queue:
-        #print(queue)
-        q = heappop(queue)
-        if q.node not in checked:
-            checked.add(q.node)
-            path = q.path + [q.node]
-            if q.node is target:
-                return q.dist, path
-            for dist_n, node_n in graph.get(q.node):
-                if node_n not in checked:
-                    heappush(queue, Q(q.dist+dist_n, node_n, path))
-    return float('inf')
+        queue = [self.Q(0, start, [])]
+        checked = set()
 
-#print("TEST: walk(relationships, sql_tables['mid-mids'], sql_tables['top-rights'])")
-#print(walk(relationships, sql_tables['mid-mids'], sql_tables['top-rights']))
+        while queue:
+            q = heappop(queue)
+            if q.node not in checked:
+                checked.add(q.node)
+                path = q.path + [q.node]
+                if q.node is target:
+                    return q.dist, path
+                for dist_n, node_n in graph.get(q.node):
+                    if node_n not in checked:
+                        heappush(queue, self.Q(q.dist+dist_n, node_n, path))
+        return float('inf')
+
+#g = Graph(Base)
+#g.walk(g.tables['mid-mids'], g.tables['top-rights'])
