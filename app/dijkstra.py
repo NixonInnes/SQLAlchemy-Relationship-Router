@@ -51,7 +51,7 @@ def walk(rels, start, target):
             path = q.path + [q.node]
             if q.node is target:
                 return q.dist, path
-            for dist_n, node_n in graph.get(q.node, ()):
+            for dist_n, node_n in graph.get(q.node):
                 if node_n not in checked:
                     heappush(queue, Q(q.dist+dist_n, node_n, path))
     return float('inf')
